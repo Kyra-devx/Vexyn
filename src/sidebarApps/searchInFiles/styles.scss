@@ -1,0 +1,179 @@
+.search-in-files {
+  width: calc(100% - 40px - 20px) !important;
+  margin: 0 auto;
+  overflow: visible !important;
+
+  [is='details'] {
+    width: 100%;
+
+    >[is='summary'] {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      textarea,
+      input {
+        margin: 0 !important;
+        white-space: nowrap;
+        overflow-x: auto !important;
+      }
+
+      .marker::after {
+        width: 10px;
+        font-size: 1rem;
+        content: '\25B6';
+      }
+    }
+
+    >[is='summary']~* {
+      display: none;
+      margin: 0 0 5px auto !important;
+    }
+
+    &[open] {
+      >[is='summary'] {
+        .marker::after {
+          content: '\25BC';
+        }
+      }
+
+      >[is='summary']~* {
+        display: block;
+      }
+
+      >[is='summary']~div {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+
+        >* {
+          margin: 0 !important;
+        }
+      }
+    }
+  }
+
+  .cm-editor {
+    height: 100%;
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--primary-text-color);
+
+
+    .cm-content {
+      background-color: inherit;
+      color: inherit;
+      padding: 0 !important;
+
+      .cm-line {
+        padding: 0 !important;
+      }
+
+      .cm-line:nth-child(odd) {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+      }
+    }
+
+    .cm-scroller {
+      overflow: auto;
+    }
+
+    .cm-line.cm-fileName .cm-foldChevron {
+      display: inline-flex;
+      align-items: center;
+      width: auto;
+      margin-right: 2px;
+      opacity: 0.9;
+      vertical-align: middle;
+    }
+
+
+    .cm-line.cm-fileName {
+      font-weight: 600;
+    }
+
+    .cm-line.cm-fileName .cm-fileIcon {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin-right: 2px;
+      font-size: 1em;
+      line-height: 1;
+    }
+
+    .cm-line.cm-fileName .cm-fileCount {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 0.9em;
+      color: var(--secondary-text-color);
+    }
+
+    .cm-collapsedSummary {
+      padding: 4px 8px;
+      margin: 2px 0 6px 18px;
+      font-size: 0.9em;
+      color: var(--secondary-text-color);
+      background: color-mix(in srgb, var(--secondary-color) 60%, transparent);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+
+    /* Match highlight */
+    .cm-match {
+      background: color-mix(in srgb, var(--active-color) 60%, transparent);
+      color: var(--secondary-text-color);
+      outline: 1px solid var(--border-color);
+      border-radius: 2px;
+      font-weight: 500;
+    }
+  }
+
+  .cm-editor {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .search-in-file-editor {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    display: block;
+  }
+
+  textarea {
+    height: auto;
+    resize: none;
+    overflow-y: hidden;
+  }
+
+  .extras {
+    display: block !important;
+    line-height: 0px !important;
+    margin-bottom: 10px !important;
+    text-align: right !important;
+  }
+
+  .options {
+    width: 100%;
+    margin-bottom: 10px;
+    text-align: right;
+  }
+
+  button {
+    display: inline-block;
+    background-color: transparent;
+    border: none;
+    color: rgb(37, 37, 37);
+    color: var(--secondary-text-color);
+  }
+
+  .error {
+    color: orangered;
+  }
+
+  .search-result {
+    position: relative;
+    padding-bottom: 5px;
+  }
+}
