@@ -1,0 +1,97 @@
+@use "../../styles/mixins.scss";
+
+.file-tree {
+	--file-tree-indent: 22px;
+	--file-tree-row-height: 30px;
+
+	position: relative;
+	box-sizing: border-box;
+	width: 100% !important;
+	min-width: 100%;
+	padding: 0 !important;
+	overflow: auto !important;
+	overflow-anchor: none;
+	overscroll-behavior: contain;
+	touch-action: pan-x pan-y;
+	-webkit-overflow-scrolling: touch;
+	contain: layout paint style;
+
+	.virtual-list-surface,
+	.virtual-list-items {
+		min-width: 100%;
+		width: max-content;
+	}
+
+	.file-tree-row {
+		position: relative;
+		display: flex;
+		box-sizing: border-box;
+		height: var(--file-tree-row-height) !important;
+		min-height: var(--file-tree-row-height);
+		min-width: 100%;
+		width: max-content !important;
+		padding-left: calc(var(--file-tree-depth) * var(--file-tree-indent));
+		background-color: transparent;
+		cursor: default;
+		outline: none;
+		contain: layout style;
+
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0 auto 0 0;
+			width: calc(var(--file-tree-depth) * var(--file-tree-indent));
+			pointer-events: none;
+			opacity: 0.55;
+			background-image: repeating-linear-gradient(
+				to right,
+				transparent 0,
+				transparent 10px,
+				var(--border-color) 10px,
+				var(--border-color) 11px,
+				transparent 11px,
+				transparent var(--file-tree-indent)
+			);
+		}
+
+		&:active,
+		&:focus,
+		&[aria-selected="true"] {
+			background-color: rgba(0, 0, 0, 0.16);
+		}
+
+		&.loading {
+			@include mixins.bar-loader(30%, 2px);
+		}
+
+		>.icon {
+			height: var(--file-tree-row-height) !important;
+			width: var(--file-tree-row-height) !important;
+			min-width: var(--file-tree-row-height) !important;
+			font-size: 1.08em !important;
+			line-height: var(--file-tree-row-height) !important;
+			background-size: 27px !important;
+		}
+
+		>.folder::before {
+			content: "\e92c";
+		}
+
+		&[aria-expanded="true"]>.folder::before {
+			content: "\e92d";
+		}
+
+		>.text {
+			width: max-content !important;
+			min-width: max-content;
+			padding-right: 14px;
+			white-space: nowrap !important;
+			overflow: visible !important;
+			text-overflow: clip !important;
+		}
+
+		>:last-child {
+			display: none;
+		}
+	}
+}
