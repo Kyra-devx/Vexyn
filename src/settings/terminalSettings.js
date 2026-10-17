@@ -1,0 +1,405 @@
+import fsOperation from "fileSystem";
+import settingsPage from "components/settingsPage";
+import {
+	DEFAULT_TERMINAL_SETTINGS,
+	TerminalThemeManager,
+} from "components/terminal";
+import toast from "components/toast";
+import alert from "dialogs/alert";
+import confirm from "dialogs/confirm";
+import loader from "dialogs/loader";
+import fonts from "lib/fonts";
+import appSettings from "lib/settings";
+import FileBrowser from "pages/fileBrowser";
+import helpers from "utils/helpers";
+
+export default function terminalSettings() {
+	const title = strings["terminal settings"];
+	const values = appSettings.value;
+
+	// Initialize terminal settings with defaults if not present
+	if (!values.terminalSettings) {
+		values.terminalSettings = {
+			...DEFAULT_TERMINAL_SETTINGS,
+			fontFamily:
+				DEFAULT_TERMINAL_SETTINGS.fontFamily || appSettings.value.fontFamily,
+		};
+	}
+
+	const terminalValues = values.terminalSettings;
+
+	const items = [
+		{
+			key: "all_file_access",
+			text: strings["allFileAccess"],
+			info: strings["info-all_file_access"],
+		},
+		{
+			key: "fontSize",
+			text: strings["font size"],
+			value: terminalValues.fontSize,
+			prompt: strings["font size"],
+			promptType: "number",
+			promptOptions: {
+				test(value) {
+					value = Number.parseInt(value);
+					return value >= 8 && value <= 32;
+				},
+			},
+			info: strings["info-fontSize"],
+		},
+		{
+			key: "fontFamily",
+			text: strings["terminal:font family"],
+			value: terminalValues.fontFamily,
+			get select() {
+				return fonts.getNames();
+			},
+			info: strings["info-fontFamily"],
+		},
+		{
+			key: "theme",
+			text: strings["theme"],
+			value: terminalValues.theme,
+			info: strings["info-theme"],
+			get select() {
+				return TerminalThemeManager.getThemeNames().map((name) => [
+					name,
+					name.charAt(0).toUpperCase() + name.slice(1),
+				]);
+			},
+			valueText(value) {
+				const option = this.select.find(([v]) => v === value);
+				return option ? option[1] : value;
+			},
+		},
+		{
+			key: "cursorStyle",
+			text: strings["terminal:cursor style"],
+			value: terminalValues.cursorStyle,
+			select: ["block", "underline", "bar"],
+			info: strings["info-cursorStyle"],
+		},
+		{
+			key: "cursorInactiveStyle",
+			text: strings["terminal:cursor inactive style"],
+			value: terminalValues.cursorInactiveStyle,
+			select: ["outline", "block", "bar", "underline", "none"],
+			info: strings["info-cursorInactiveStyle"],
+		},
+		{
+			key: "fontWeight",
+			text: strings["terminal:font weight"],
+			value: terminalValues.fontWeight,
+			select: [
+				"normal",
+				"bold",
+				"100",
+				"200",
+				"300",
+				"400",
+				"500",
+				"600",
+				"700",
+				"800",
+				"900",
+			],
+			info: strings["info-fontWeight"],
+		},
+		{
+			key: "cursorBlink",
+			text: strings["terminal:cursor blink"],
+			checkbox: terminalValues.cursorBlink,
+			info: strings["info-cursorBlink"],
+		},
+		{
+			key: "scrollback",
+			text: strings["terminal:scrollback"],
+			value: terminalValues.scrollback,
+			prompt: strings["terminal:scrollback"],
+			promptType: "number",
+			promptOptions: {
+				test(value) {
+					value = Number.parseInt(value);
+					return value >= 100 && value <= 10000;
+				},
+			},
+			info: strings["info-scrollback"],
+		},
+		{
+			key: "tabStopWidth",
+			text: strings["terminal:tab stop width"],
+			value: terminalValues.tabStopWidth,
+			prompt: strings["terminal:tab stop width"],
+			promptType: "number",
+			promptOptions: {
+				test(value) {
+					value = Number.parseInt(value);
+					return value >= 1 && value <= 8;
+				},
+			},
+			info: strings["info-tabStopWidth"],
+		},
+		{
+			key: "letterSpacing",
+			text: strings["letter spacing"],
+			value: terminalValues.letterSpacing,
+			prompt: strings["letter spacing"],
+			promptType: "number",
+			info: strings["info-letterSpacing"],
+		},
+		{
+			key: "convertEol",
+			text: strings["terminal:convert eol"],
+			checkbox: terminalValues.convertEol,
+		},
+		{
+			key: "imageSupport",
+			text: strings["terminal:image support"],
+			checkbox: terminalValues.imageSupport,
+			info: strings["info-imageSupport"],
+		},
+		{
+			key: "fontLigatures",
+			text: strings["font ligatures"],
+			checkbox: terminalValues.fontLigatures,
+			info: strings["info-fontLigatures"],
+		},
+		{
+			key: "confirmTabClose",
+			text: strings["terminal:confirm tab close"],
+			checkbox: terminalValues.confirmTabClose !== false,
+			info: strings["info-confirmTabClose"],
+		},
+		{
+			key: "backup",
+			text: strings.backup,
+			info: strings["info-backup"],
+		},
+		{
+			key: "restore",
+			text: strings.restore,
+			info: strings["info-restore"],
+		},
+		{
+			key: "uninstall",
+			text: strings.uninstall,
+			info: strings["info-uninstall"],
+		},
+	];
+
+	return settingsPage(title, items, callback, undefined, {
+		preserveOrder: true,
+	});
+
+	/**
+	 * Callback for settings page when an item is clicked
+	 * @param {string} key
+	 * @param {string} value
+	 */
+	async function callback(key, value) {
+		switch (key) {
+			case "all_file_access":
+				if (ANDROID_SDK_INT >= 30) {
+					system.isManageExternalStorageDeclared((boolStr) => {
+						if (boolStr === "true") {
+							system.requestStorageManager(console.log, console.error);
+						} else {
+							alert("This feature is not available.");
+						}
+					}, alert);
+				} else {
+					alert("This feature is not available.");
+				}
+
+				return;
+			case "backup":
+				terminalBackup();
+				return;
+
+			case "restore":
+				terminalRestore();
+				return;
+
+			case "uninstall":
+				const confirmation = await confirm(
+					strings.confirm,
+					"Are you sure you want to uninstall the terminal?",
+				);
+				if (confirmation) {
+					loader.showTitleLoader();
+					Terminal.uninstall()
+						.then(() => {
+							loader.removeTitleLoader();
+							alert(
+								strings.success.toUpperCase(),
+								"Terminal uninstalled successfully.",
+							);
+						})
+						.catch((error) => {
+							loader.removeTitleLoader();
+							console.error("Terminal uninstall failed:", error);
+							helpers.error(error);
+						});
+				}
+				return;
+
+			default:
+				appSettings.update({
+					terminalSettings: {
+						...values.terminalSettings,
+						[key]: value,
+					},
+				});
+
+				// Update any active terminal instances
+				updateActiveTerminals(key, value);
+				break;
+		}
+	}
+
+	/**
+	 * Creates a backup of the terminal installation
+	 */
+	async function terminalBackup() {
+		try {
+			// Ask user to select backup location
+			const { url } = await FileBrowser("folder", strings["select folder"]);
+
+			loader.showTitleLoader();
+
+			// Create backup
+			const backupPath = await Terminal.backup();
+			await system.copyToUri(
+				backupPath,
+				url,
+				"aterm_backup.tar",
+				console.log,
+				console.error,
+			);
+			loader.removeTitleLoader();
+			alert(strings.success.toUpperCase(), `${strings["backup successful"]}.`);
+		} catch (error) {
+			loader.removeTitleLoader();
+			console.error("Terminal backup failed:", error);
+			toast(error.toString());
+		}
+	}
+
+	/**
+	 * Restores terminal installation
+	 */
+	async function terminalRestore() {
+		try {
+			sdcard.openDocumentFile(
+				async (data) => {
+					loader.showTitleLoader();
+					//this will create a file at $PREFIX/atem_backup.bin
+					await system.copyToUri(
+						data.uri,
+						cordova.file.dataDirectory,
+						"aterm_backup",
+						console.log,
+						console.error,
+					);
+
+					// Restore
+					await Terminal.restore();
+
+					// Clean up
+					const backupFilename = "aterm_backup.bin";
+					const tempBackupPath = cordova.file.dataDirectory + backupFilename;
+					const tempFS = fsOperation(tempBackupPath);
+					await tempFS.delete();
+					loader.removeTitleLoader();
+					alert(
+						strings.success.toUpperCase(),
+						"Terminal restored successfully",
+					);
+				},
+				toast,
+				"application/x-tar",
+			);
+		} catch (error) {
+			loader.removeTitleLoader();
+			console.error("Terminal restore failed:", error);
+			toast(error.toString());
+		}
+	}
+}
+
+/**
+ * Update active terminal instances with new settings
+ * @param {string} key
+ * @param {any} value
+ */
+async function updateActiveTerminals(key, value) {
+	// Find all terminal tabs and update their settings
+	const terminalTabs = editorManager.files.filter(
+		(file) => file.type === "terminal",
+	);
+
+	terminalTabs.forEach(async (tab) => {
+		if (tab.terminalComponent) {
+			const terminalOptions = {};
+
+			switch (key) {
+				case "fontSize":
+					tab.terminalComponent.terminal.options.fontSize = value;
+					break;
+				case "fontFamily":
+					// Load font if it's not already loaded
+					try {
+						await fonts.loadFont(value);
+					} catch (error) {
+						console.warn(`Failed to load font ${value}:`, error);
+					}
+					tab.terminalComponent.terminal.options.fontFamily = value;
+					tab.terminalComponent.terminal.refresh(
+						0,
+						tab.terminalComponent.terminal.rows - 1,
+					);
+					break;
+				case "fontWeight":
+					tab.terminalComponent.terminal.options.fontWeight = value;
+					break;
+				case "cursorBlink":
+					tab.terminalComponent.terminal.options.cursorBlink = value;
+					break;
+				case "cursorStyle":
+					tab.terminalComponent.terminal.options.cursorStyle = value;
+					break;
+				case "cursorInactiveStyle":
+					tab.terminalComponent.terminal.options.cursorInactiveStyle = value;
+					break;
+				case "scrollback":
+					tab.terminalComponent.terminal.options.scrollback = value;
+					break;
+				case "tabStopWidth":
+					tab.terminalComponent.terminal.options.tabStopWidth = value;
+					break;
+				case "convertEol":
+					tab.terminalComponent.terminal.options.convertEol = value;
+					break;
+				case "letterSpacing":
+					tab.terminalComponent.terminal.options.letterSpacing = value;
+					break;
+				case "theme":
+					tab.terminalComponent.terminal.options.theme =
+						TerminalThemeManager.getTheme(value);
+					// Update container background to match new theme
+					if (tab.terminalComponent.container) {
+						tab.terminalComponent.container.style.background =
+							tab.terminalComponent.terminal.options.theme.background;
+					}
+					break;
+				case "imageSupport":
+					tab.terminalComponent.updateImageSupport(value);
+					break;
+				case "fontLigatures":
+					tab.terminalComponent.updateFontLigatures(value);
+					break;
+			}
+		}
+	});
+}
