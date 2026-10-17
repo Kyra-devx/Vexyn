@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        background-color: #20202c; /* fallback dark */
+      }
+
+      :root {
+        --bg-color: #20202c; /* fallback splash color */
+        --test-height: 45px;
+      }
+
+      body.loading {
+        position: relative;
+      }
+
+      body.loading #splash {
+        display: block;
+      }
+
+      #splash {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+
+        background-image: url("./logo.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 180px;
+        background-color: var(--bg-color);
+
+        text-align: center;
+
+        /* Disable any possible fade */
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .splash-version {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+
+        color: rgb(209, 209, 209);
+        font-size: 0.8rem;
+        white-space: pre;
+        font-family: monospace;
+        text-align: left;
+      }
+
+      .splash-message {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgb(209, 209, 209);
+        font-size: 1rem;
+        width: 90vw;
+        text-align: center;
+      }
+    </style>
+
+    <!-- Set theme color BEFORE UI renders -->
+    <script>
+      (function () {
+        var color = localStorage.getItem("__primary_color");
+        var bg = color || "#20202c";
+
+        document.documentElement.style.setProperty("--bg-color", bg);
+        document.documentElement.style.backgroundColor = bg;
+        document.body && (document.body.style.backgroundColor = bg);
+      })();
+    </script>
+
+    <!-- Core Scripts -->
+    <script src="cordova.js"></script>
+    
+    <script src="./build/main.js"></script>
+
+
+    <link rel="stylesheet" href="./build/main.css" />
+
+    <title>Acode</title>
+  </head>
+
+  <body class="loading" data-version="" data-small-msg="">
+    <div id="splash">
+      <div class="splash-version"></div>
+      <div class="splash-message"></div>
+    </div>
+
+    <wc-page id="root" class="primary"></wc-page>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const splash = document.getElementById("splash");
+
+        function updateSplash() {
+          splash.querySelector(".splash-version").textContent =
+            document.body.getAttribute("data-version") || "";
+
+          splash.querySelector(".splash-message").textContent =
+            document.body.getAttribute("data-small-msg") || "";
+        }
+
+        updateSplash();
+
+        new MutationObserver(updateSplash).observe(document.body, {
+          attributes: true,
+          attributeFilter: ["data-version", "data-small-msg"],
+        });
+      });
+    </script>
+  </body>
+</html>
