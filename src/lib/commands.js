@@ -1,0 +1,649 @@
+import fsOperation from "fileSystem";
+import { selectAll } from "@codemirror/commands";
+import Sidebar from "components/sidebar";
+import { TerminalManager } from "components/terminal";
+import color from "dialogs/color";
+import confirm from "dialogs/confirm";
+import prompt from "dialogs/prompt";
+import select from "dialogs/select";
+import actions from "handlers/quickTools";
+import recents from "lib/recents";
+import About from "pages/about";
+import FileBrowser from "pages/fileBrowser";
+import plugins from "pages/plugins";
+import Problems from "pages/problems/problems";
+import openWelcomeTab from "pages/welcome/welcome";
+import changeEncoding from "palettes/changeEncoding";
+import changeMode from "palettes/changeMode";
+import changeTheme from "palettes/changeTheme";
+import commandPalette from "palettes/commandPalette";
+import findFile from "palettes/findFile";
+import browser from "plugins/browser";
+import help from "settings/helpSettings";
+import mainSettings from "settings/mainSettings";
+import { runAllTests } from "test/tester";
+import { getColorRange } from "utils/color/regex";
+import helpers from "utils/helpers";
+import Url from "utils/Url";
+import checkFiles from "./checkFiles";
+import config from "./config";
+import EditorFile from "./editorFile";
+import openFile from "./openFile";
+import openFolder from "./openFolder";
+import run from "./run";
+import saveState from "./saveState";
+import appSettings from "./settings";
+import showFileInfo from "./showFileInfo";
+
+function getTabCloseSelectionOptions() {
+	return {
+		unsavedWarning:
+			strings["unsaved selected tabs warning"] ||
+			"Some selected tabs are not saved. Choose what to do.",
+		saveLabel: strings["save selected tabs"] || "Save selected tabs",
+		closeLabel: strings["close selected tabs"] || "Close selected tabs",
+		saveWarning:
+			strings["save selected tabs warning"] ||
+			"Are you sure you want to save and close the selected tabs?",
+		closeWarning:
+			strings["close selected tabs warning"] ||
+			"Are you sure you want to close the selected tabs? You will lose the unsaved changes and this action cannot be reversed.",
+	};
+}
+
+function resolveReferenceFile(referenceFile) {
+	const { activeFile, getFile } = editorManager;
+
+	if (!referenceFile) return activeFile;
+	if (typeof referenceFile === "string") {
+		return getFile(referenceFile, "id") || activeFile;
+	}
+	if (referenceFile?.id) {
+		return getFile(referenceFile.id, "id") || referenceFile;
+	}
+
+	return referenceFile;
+}
+
+function getTabsRelativeToFile(side, referenceFile) {
+	const { files } = editorManager;
+	const file = resolveReferenceFile(referenceFile);
+	const activeIndex = files.indexOf(file);
+
+	if (activeIndex === -1) return [];
+
+	switch (side) {
+		case "left":
+			return files.slice(0, activeIndex);
+		case "right":
+			return files.slice(activeIndex + 1);
+		case "others":
+			return files.filter((_, index) => index !== activeIndex);
+		default:
+			return [];
+	}
+}
+
+async function closeTabs(files, options = {}) {
+	const closableFiles = files.filter((file) => file && !file.pinned);
+	if (!closableFiles.length) return false;
+
+	const {
+		unsavedWarning = strings["unsaved files warning"],
+		saveLabel = strings["save all"],
+		closeLabel = strings["close all"],
+		saveWarning = strings["save all warning"],
+		closeWarning = strings["close all warning"],
+	} = options;
+
+	let save = false;
+	const unsavedFiles = closableFiles.filter((file) => file.isUnsaved).length;
+	if (unsavedFiles) {
+		const confirmation = await confirm(strings["warning"], unsavedWarning);
+		if (!confirmation) return false;
+
+		const option = await select(strings["select"], [
+			["save", saveLabel],
+			["close", closeLabel],
+			["cancel", strings["cancel"]],
+		]);
+		if (option === "cancel") return false;
+
+		if (option === "save") {
+			const doSave = await confirm(strings["warning"], saveWarning);
+			if (!doSave) return false;
+			save = true;
+		} else {
+			const doClose = await confirm(strings["warning"], closeWarning);
+			if (!doClose) return false;
+		}
+	}
+
+	for (const file of [...closableFiles]) {
+		if (save) {
+			await file.save();
+		}
+
+		await file.remove(true, { silentPinned: true });
+	}
+
+	return true;
+}
+
+export default {
+	async "run-tests"() {
+		await runAllTests();
+	},
+	async "close-all-tabs"() {
+		await closeTabs(editorManager.files);
+	},
+	async "close-tabs-to-left"(referenceFile) {
+		await closeTabs(
+			getTabsRelativeToFile("left", referenceFile),
+			getTabCloseSelectionOptions(),
+		);
+	},
+	async "close-tabs-to-right"(referenceFile) {
+		await closeTabs(
+			getTabsRelativeToFile("right", referenceFile),
+			getTabCloseSelectionOptions(),
+		);
+	},
+	async "close-other-tabs"(referenceFile) {
+		await closeTabs(
+			getTabsRelativeToFile("others", referenceFile),
+			getTabCloseSelectionOptions(),
+		);
+	},
+	async "save-all-changes"() {
+		const doSave = await confirm(
+			strings["warning"],
+			strings["save all changes warning"],
+		);
+		if (!doSave) return;
+		editorManager.files.forEach((file) => {
+			file.save();
+			file.isUnsaved = false;
+		});
+	},
+	"close-current-tab"() {
+		editorManager.activeFile.remove();
+	},
+	"toggle-pin-tab"(referenceFile) {
+		resolveReferenceFile(referenceFile)?.togglePinned?.();
+	},
+	console() {
+		run(true, "inapp");
+	},
+	"check-files"() {
+		if (!appSettings.value.checkFiles) return;
+		checkFiles();
+	},
+	"command-palette"() {
+		commandPalette();
+	},
+	"disable-fullscreen"() {
+		app.classList.remove("fullscreen-mode");
+		this["resize-editor"]();
+	},
+	"enable-fullscreen"() {
+		app.classList.add("fullscreen-mode");
+		this["resize-editor"]();
+	},
+	encoding() {
+		changeEncoding();
+	},
+	exit() {
+		navigator.app.exitApp();
+	},
+	"edit-with"() {
+		editorManager.activeFile.editWith();
+	},
+	"find-file"() {
+		findFile();
+	},
+	files() {
+		FileBrowser("both", strings["file browser"])
+			.then(FileBrowser.open)
+			.catch(FileBrowser.openError);
+	},
+	find() {
+		actions("search");
+	},
+	"file-info"(url) {
+		showFileInfo(url);
+	},
+	async goto() {
+		const lastLine = editorManager.editor?.state?.doc?.lines;
+		const message = lastLine
+			? `${strings["enter line number"]} (1..${lastLine})`
+			: strings["enter line number"];
+		const res = await prompt(message, "", "number", {
+			placeholder: "line.column",
+		});
+
+		if (!res) return;
+		const [lineStr, colStr] = String(res).split(".");
+		editorManager.editor.gotoLine(lineStr, colStr);
+	},
+	async "new-file"() {
+		let filename = await prompt(strings["enter file name"], "", "filename", {
+			match: config.FILE_NAME_REGEX,
+			required: true,
+		});
+
+		filename = helpers.fixFilename(filename);
+		if (!filename) return;
+
+		new EditorFile(filename, {
+			isUnsaved: false,
+		});
+	},
+	"next-file"() {
+		const len = editorManager.files.length;
+		let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
+
+		if (fileIndex === len - 1) fileIndex = 0;
+		else ++fileIndex;
+
+		editorManager.files[fileIndex].makeActive();
+	},
+	open(page) {
+		switch (page) {
+			case "settings":
+				mainSettings();
+				break;
+
+			case "help":
+				help();
+				break;
+
+			case "problems":
+				Problems();
+				break;
+
+			case "plugins":
+				plugins();
+				break;
+
+			case "file_browser":
+				FileBrowser();
+				break;
+
+			case "about":
+				About();
+				break;
+
+			default:
+				return;
+		}
+		editorManager.editor.contentDOM.blur();
+	},
+	"open-with"() {
+		editorManager.activeFile.openWith();
+	},
+	"open-file"() {
+		editorManager.editor.contentDOM.blur();
+		FileBrowser("file")
+			.then(FileBrowser.openFile)
+			.catch(FileBrowser.openFileError);
+	},
+	"open-folder"() {
+		editorManager.editor.contentDOM.blur();
+		FileBrowser("folder")
+			.then(FileBrowser.openFolder)
+			.catch(FileBrowser.openFolderError);
+	},
+	"prev-file"() {
+		const len = editorManager.files.length;
+		let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
+
+		if (fileIndex === 0) fileIndex = len - 1;
+		else --fileIndex;
+
+		editorManager.files[fileIndex].makeActive();
+	},
+	"read-only"() {
+		const file = editorManager.activeFile;
+		file.editable = !file.editable;
+	},
+	recent() {
+		recents.select().then((res) => {
+			const { type } = res;
+			if (helpers.isFile(type)) {
+				openFile(res.val, {
+					render: true,
+				}).catch((err) => {
+					helpers.error(err);
+				});
+			} else if (helpers.isDir(type)) {
+				openFolder(res.val.url, res.val.opts);
+			} else if (res === "clear") {
+				recents.clear();
+			}
+		});
+	},
+	replace() {
+		this.find();
+	},
+	"resize-editor"() {
+		// TODO : Codemirror
+		//editorManager.editor.resize(true);
+	},
+	"open-inapp-browser"(url) {
+		browser.open(url);
+	},
+	run() {
+		editorManager.activeFile[
+			appSettings.value.useCurrentFileForPreview ? "runFile" : "run"
+		]?.();
+	},
+	"run-file"() {
+		editorManager.activeFile.runFile?.();
+	},
+	async save(showToast) {
+		try {
+			await editorManager.activeFile.save();
+			if (showToast) {
+				toast(strings["file saved"]);
+			}
+		} catch (error) {
+			helpers.error(error);
+		}
+	},
+	async "save-as"(showToast) {
+		try {
+			await editorManager.activeFile.saveAs();
+			if (showToast) {
+				toast(strings["file saved"]);
+			}
+		} catch (error) {
+			helpers.error(error);
+		}
+	},
+	"save-state"() {
+		saveState();
+	},
+	share() {
+		editorManager.activeFile.share();
+	},
+	async "pin-file-shortcut"() {
+		const file = editorManager.activeFile;
+		if (!file?.uri) {
+			toast(strings["save file before home shortcut"]);
+			return;
+		}
+
+		if (typeof system?.pinFileShortcut !== "function") {
+			toast(strings["pin shortcuts not supported"]);
+			return;
+		}
+
+		const { uri, filename } = file;
+		const label = filename;
+		const description = filename;
+
+		let id = uri.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+		if (!id) {
+			id = helpers.uuid();
+		}
+		if (id.length > 40) {
+			id = id.slice(-40);
+		}
+		id = `file-${id}`;
+
+		const shortcut = {
+			id,
+			label,
+			description,
+			uri,
+		};
+
+		const requestShortcut = new Promise((resolve, reject) => {
+			system.pinFileShortcut(
+				shortcut,
+				() => resolve(true),
+				(err) => reject(err),
+			);
+		});
+
+		try {
+			await requestShortcut;
+			toast(strings["shortcut request sent"]);
+		} catch (error) {
+			if (
+				typeof error === "string" &&
+				error.toLowerCase().includes("not supported")
+			) {
+				toast(strings["pin shortcuts not supported"]);
+				return;
+			}
+			helpers.error(error);
+		}
+	},
+	syntax() {
+		changeMode();
+	},
+	"change-app-theme"() {
+		changeTheme("app");
+	},
+	"change-editor-theme"() {
+		changeTheme("editor");
+	},
+	"toggle-fullscreen"() {
+		app.classList.toggle("fullscreen-mode");
+		this["resize-editor"]();
+	},
+	"toggle-sidebar"() {
+		Sidebar.toggle();
+	},
+	"toggle-menu"() {
+		tag.get("[action=toggle-menu]")?.click();
+	},
+	"toggle-editmenu"() {
+		tag.get("[action=toggle-edit-menu")?.click();
+	},
+	async "insert-color"() {
+		const { editor } = editorManager;
+		const range = getColorRange();
+		let defaultColor = "";
+
+		if (range) {
+			try {
+				defaultColor = editor.state.doc.sliceString(range.from, range.to);
+			} catch (_) {
+				defaultColor = "";
+			}
+		}
+
+		editor.contentDOM.blur();
+		const wasFocused = editorManager.activeFile.focused;
+		let res;
+		try {
+			res = await color(defaultColor, () => {
+				if (wasFocused) {
+					editor.focus();
+				}
+			});
+		} catch (_) {
+			return;
+		}
+
+		if (range) {
+			editor.dispatch({
+				changes: { from: range.from, to: range.to, insert: res },
+			});
+			return;
+		}
+		editor.insert(res);
+	},
+	copy() {
+		editorManager.editor.execCommand("copy");
+	},
+	cut() {
+		editorManager.editor.execCommand("cut");
+	},
+	paste() {
+		editorManager.editor.execCommand("paste");
+	},
+	"select-all"() {
+		const { editor } = editorManager;
+		selectAll(editor);
+	},
+	async rename(file) {
+		file = file || editorManager.activeFile;
+
+		if (file.SAFMode === "single") {
+			alert(strings.info.toUpperCase(), strings["unable to rename"]);
+			return;
+		}
+
+		let newname = await prompt(strings.rename, file.filename, "filename", {
+			match: config.FILE_NAME_REGEX,
+			capitalize: false,
+		});
+
+		newname = helpers.fixFilename(newname);
+		if (!newname || newname === file.filename) return;
+
+		const { uri } = file;
+		if (uri) {
+			const fs = fsOperation(uri);
+			try {
+				let newUri;
+				if (uri.startsWith("content://com.termux.documents/tree/")) {
+					// Special handling for Termux content files
+					const newFilePath = Url.join(Url.dirname(uri), newname);
+					const content = await fs.readFile();
+					await fsOperation(Url.dirname(uri)).createFile(newname, content);
+					await fs.delete();
+					newUri = newFilePath;
+				} else {
+					newUri = await fs.renameTo(newname);
+				}
+				const stat = await fsOperation(newUri).stat();
+
+				newname = stat.name;
+				file.uri = newUri;
+				file.filename = newname;
+
+				openFolder.renameItem(uri, newUri, newname);
+				toast(strings["file renamed"]);
+			} catch (err) {
+				helpers.error(err);
+			}
+		} else {
+			file.filename = newname;
+		}
+	},
+	async format(selectIfNull) {
+		const { editor } = editorManager;
+		const pos = editor.getCursorPosition();
+
+		const didFormat = await acode.format(selectIfNull);
+		if (didFormat) {
+			// Restore cursor position after formatting (pos.row is now 1-based)
+			editor.gotoLine(pos.row, pos.column);
+		}
+	},
+	async eol() {
+		const eol = await select(strings["new line mode"], ["unix", "windows"], {
+			default: editorManager.activeFile.eol,
+		});
+		editorManager.activeFile.eol = eol;
+	},
+	"open-log-file"() {
+		openFile(Url.join(DATA_STORAGE, config.LOG_FILE_NAME));
+	},
+	"copy-device-info"() {
+		let webviewInfo = {};
+		let appInfo = {};
+		const getWebviewInfo = new Promise((resolve, reject) => {
+			system.getWebviewInfo(
+				(res) => {
+					webviewInfo = res;
+					resolve();
+				},
+				(error) => {
+					console.error("Error getting WebView info:", error);
+					reject(error);
+				},
+			);
+		});
+		const getAppInfo = new Promise((resolve, reject) => {
+			system.getAppInfo(
+				(res) => {
+					appInfo = res;
+					resolve();
+				},
+				(error) => {
+					console.error("Error getting app info:", error);
+					reject(error);
+				},
+			);
+		});
+
+		Promise.all([getWebviewInfo, getAppInfo])
+			.then(() => {
+				let info = `Device Information:
+WebView Info:
+		Package Name: ${webviewInfo?.packageName || "N/A"}
+		Version: ${webviewInfo?.versionName || "N/A"}
+
+App Info:
+		Name: ${appInfo?.label || "N/A"}
+		Package Name: ${appInfo?.packageName || "N/A"}
+		Version: ${appInfo?.versionName || "N/A"}
+		Version Code: ${appInfo?.versionCode || "N/A"}
+
+Device Info:
+		Android Version: ${device?.version || "N/A"}
+		Manufacturer: ${device?.manufacturer || "N/A"}
+		Model: ${device?.model || "N/A"}
+		Platform: ${device?.platform || "N/A"}
+		Cordova Version: ${device?.cordova || "N/A"}
+
+Screen Info:
+		Width: ${screen?.width || "N/A"}
+		Height: ${screen?.height || "N/A"}
+		Color Depth: ${screen?.colorDepth || "N/A"}
+
+Additional Info:
+		Language: ${navigator?.language || "N/A"}
+		User Agent: ${navigator?.userAgent || "N/A"}
+`;
+
+				// Copy the info to clipboard
+				if (cordova.plugins.clipboard) {
+					cordova.plugins.clipboard.copy(info);
+				}
+			})
+			.catch((error) => {
+				console.error("Error getting device info:", error);
+				toast("Failed to get device info");
+			});
+	},
+	async "new-terminal"() {
+		try {
+			await TerminalManager.createServerTerminal();
+		} catch (error) {
+			console.error("Failed to create terminal:", error);
+			window.toast("Failed to create terminal");
+		}
+	},
+	welcome() {
+		openWelcomeTab();
+	},
+	async "toggle-inspector"() {
+		const devTools = (await import("lib/devTools")).default;
+		devTools.toggle();
+	},
+	async "open-inspector"() {
+		const devTools = (await import("lib/devTools")).default;
+		devTools.show();
+	},
+	async "lsp-info"() {
+		const { showLspInfoDialog } = await import("components/lspInfoDialog");
+		showLspInfoDialog();
+	},
+};
