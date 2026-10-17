@@ -1,0 +1,112 @@
+.container.files {
+  > .open-folder-action {
+    flex: 0 0 44px;
+    min-height: 44px;
+    min-width: 44px;
+    width: calc(100% - 16px);
+    margin: auto 8px;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &.has-open-projects > .open-folder-action {
+    display: none;
+  }
+
+  /* Make the container horizontally scrollable */
+  overflow-x: auto !important;
+  max-width: 100%;
+
+  &::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+  .list {
+    min-width: 100%;
+    width: max-content;
+    max-width: none;
+  }
+
+  ul {
+    min-width: 100%;
+    width: max-content;
+    overflow-x: visible !important;
+    max-width: none;
+    margin-left: 0;
+    &::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+  }
+
+  li {
+    min-width: 100%;
+    width: max-content;
+  }
+
+  .tile {
+    > .text {
+      white-space: nowrap !important;
+      overflow: visible !important;
+      width: max-content !important;
+      text-overflow: clip !important;
+    }
+  }
+
+  > .list > .tile[data-type="root"] > .text {
+    min-width: 0;
+    width: auto !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Add indent guides for folders (excluding first level) */
+  .list.collapsible > ul > .collapsible > ul {
+    position: relative;
+    padding-left: 24px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 0;
+      height: 100%;
+      width: 1px;
+      background: var(--border-color);
+      z-index: 0;
+    }
+
+    /* Add guides for deeper nesting */
+    .collapsible > ul {
+      padding-left: 24px;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 14px;
+        top: 0;
+        height: 100%;
+        width: 1px;
+        background: var(--border-color);
+        z-index: 0;
+      }
+    }
+  }
+}
