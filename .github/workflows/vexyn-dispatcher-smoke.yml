@@ -1,0 +1,16 @@
+name: Vexyn CI Dispatcher Smoke Test
+
+on:
+  push:
+    branches:
+      - rebrand/vexyn-core
+
+permissions:
+  contents: read
+
+jobs:
+  dispatcher-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm a runner job can start
+        run: echo "Vexyn CI dispatcher smoke test passed."
