@@ -91,6 +91,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="acode" />
+                <data android:scheme="vexyn" />
             </intent-filter>
         </config-file>
 
