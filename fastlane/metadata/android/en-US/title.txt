@@ -1,1 +1,1 @@
-Acode IDE: Terminal & AI Code
+Vexyn — Code Editor & Web IDE
