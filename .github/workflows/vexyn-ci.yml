@@ -1,9 +1,13 @@
 name: Vexyn CI
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
-      - rebrand/vexyn-core
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
