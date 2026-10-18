@@ -8,14 +8,13 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  verify-and-build:
-    name: Test, lint, and build Android APK
+  verify:
+    name: Test, lint, localize and build Vexyn APK
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -35,9 +34,15 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: package-lock.json
 
-      - name: Install locked dependencies
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install project dependencies
         run: npm ci --no-audit --no-fund
 
       - name: Unit tests
@@ -49,16 +54,7 @@ jobs:
       - name: Translation consistency check
         run: npm run lang check
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK components
-        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
-
-      - name: Install Cordova CLI
-        run: npm install --global cordova
-
-      - name: Install project dependencies and Cordova plugins
+      - name: Set up Cordova project and plugins
         run: npm run setup
 
       - name: Build Vexyn debug APK
