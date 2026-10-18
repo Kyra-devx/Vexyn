@@ -35,17 +35,17 @@ If your editor doesn't support DevContainers, you can use Docker directly:
 
 ```bash
 # Clone the repository
-git clone --recurse-submodules https://github.com/Acode-Foundation/Acode.git
+git clone --recurse-submodules https://github.com/Kyra-devx/Vexyn.git
 cd Vexyn
 
 # Build the Docker image from our Dockerfile
-docker build --target standalone -t acode-dev .devcontainer/
+docker build --target standalone -t vexyn-dev .devcontainer/
 
 # Run the container with your code mounted
 docker run -it --rm \
   -v "$(pwd):/workspaces/vexyn" \
-  -w /workspaces/acode \
-  acode-dev \
+  -w /workspaces/vexyn \
+  vexyn-dev \
   bash
 
 # Inside the container, run setup and build
@@ -57,18 +57,18 @@ pnpm run build paid dev apk # or pnpm run build p d
 **Keep container running for repeated use:**
 ```bash
 # Start container in background
-docker run -d --name acode-dev \
-  -v "$(pwd):/workspaces/acode" \
-  -w /workspaces/acode \
-  acode-dev \
+docker run -d --name vexyn-dev \
+  -v "$(pwd):/workspaces/vexyn" \
+  -w /workspaces/vexyn \
+  vexyn-dev \
   sleep infinity
 
 # Execute commands in the running container
-docker exec -it acode-dev bash -c "pnpm run setup"
-docker exec -it acode-dev pnpm run build paid dev apk
+docker exec -it vexyn-dev bash -c "pnpm run setup"
+docker exec -it vexyn-dev pnpm run build paid dev apk
 
 # Stop and remove when done
-docker stop acode-dev && docker rm acode-dev
+docker stop vexyn-dev && docker rm vexyn-dev
 ```
 
 ---
@@ -109,8 +109,8 @@ Some more environment variables, check [cordova docs](https://cordova.apache.org
 
 ```bash
 # Clone the repository
-git clone --recurse-submodules https://github.com/Acode-Foundation/Acode.git
-cd Acode
+git clone --recurse-submodules https://github.com/Kyra-devx/Vexyn.git
+cd Vexyn
 
 # Install dependencies and set up Cordova
 pnpm run setup
@@ -152,7 +152,7 @@ This usually means the repository was cloned without `--recurse-submodules`. Clo
 submodules avoids the problem entirely:
 
 ```bash
-git clone --recurse-submodules https://github.com/Acode-Foundation/Acode.git
+git clone --recurse-submodules https://github.com/Kyra-devx/Vexyn.git
 ```
 
 > [!NOTE]
@@ -221,7 +221,7 @@ Many font editing software and web-based tools exist for this purpose. Some of t
 
 ### Steps in Icomoon to add new Icons
 
-1. Download the `code-editor-icon.icomoon.json` file from https://github.com/Acode-Foundation/Acode/tree/main/utils
+1. Download the `code-editor-icon.icomoon.json` file from https://github.com/Kyra-devx/Vexyn/tree/main/utils
 2. Go to https://icomoon.io/ > Import
 3. Import the `code-editor-icon.icomoon.json` downloaded (in step 1)
 4. All icons will be displayed after importing.
@@ -236,12 +236,12 @@ Many font editing software and web-based tools exist for this purpose. Some of t
 ### Updating Project files for Icon Contribution
 1. Extract the downloaded zip file; navigate to the `fonts` folder inside it.
 2. Rename `code-editor-icon.ttf` to `icons.ttf`.
-3. Copy & paste the renamed `icons.ttf` into https://github.com/Acode-Foundation/Acode/tree/main/src/res/icons
-4. Copy and paste the `code-editor-icon.icomoon.json` file (downloaded in the adding icons steps) onto https://github.com/Acode-Foundation/Acode/tree/main/utils (yes, replace it with the newer one; we downloaded!)
+3. Copy & paste the renamed `icons.ttf` into https://github.com/Kyra-devx/Vexyn/tree/main/src/res/icons
+4. Copy and paste the `code-editor-icon.icomoon.json` file (downloaded in the adding icons steps) onto https://github.com/Kyra-devx/Vexyn/tree/main/utils (yes, replace it with the newer one; we downloaded!)
 4. Commit the changes **ON A NEW branch** (by following: [Commit Messages guide](#commit-messages))
 
 ## 🔌 Plugin Development
 
-To create plugins for Acode:
+To create plugins compatible with Vexyn's upstream-derived plugin format:
 - [Plugin Starter Repository](https://github.com/Acode-Foundation/acode-plugin)
 - [Plugin Documentation](https://docs.acode.app/)
