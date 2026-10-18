@@ -20,5 +20,5 @@ jobs:
         shell: bash
 
       - name: Validate workflow syntax and expressions
-        run: ./actionlint -color .github/workflows/ci.yml .github/workflows/on-demand-preview-releases-PR.yml .github/workflows/nightly-build.yml
+        run: ./actionlint -color .github/workflows/vexyn-ci.yml
         shell: bash
