@@ -39,7 +39,7 @@ const config = {
 
 	// Social Links
 	DOCS_URL: "https://docs.acode.app",
-	GITHUB_URL: "https://github.com/Acode-Foundation/Acode",
+	GITHUB_URL: "https://github.com/Kyra-devx/Vexyn",
 	TELEGRAM_URL: "https://t.me/foxdebug_acode",
 	DISCORD_URL: "https://discord.gg/nDqZsh7Rqz",
 	TWITTER_URL: "https://x.com/foxbiz_io",
