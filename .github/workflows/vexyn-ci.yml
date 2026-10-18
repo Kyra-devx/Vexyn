@@ -9,8 +9,29 @@ permissions:
   contents: read
 
 jobs:
-  smoke:
+  quality:
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm workflow startup
-        run: echo "Vexyn CI startup check passed."
+      - name: Checkout Vexyn
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Biome quality checks
+        run: npx biome ci .
+
+      - name: Translation consistency check
+        run: npm run lang check
