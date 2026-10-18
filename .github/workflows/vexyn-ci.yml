@@ -81,3 +81,11 @@ jobs:
           test -s "$APK"
           SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
           "$SDK_ROOT/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.vexyn.devx'"
+
+      - name: Upload Vexyn debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vexyn-debug-apk-${{ github.sha }}
+          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
