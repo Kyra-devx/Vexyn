@@ -41,3 +41,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
