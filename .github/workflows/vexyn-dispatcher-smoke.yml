@@ -1,4 +1,4 @@
-name: Vexyn CI Dispatcher Smoke Test
+name: Vexyn Workflow Diagnostics
 
 on:
   push:
@@ -9,8 +9,16 @@ permissions:
   contents: read
 
 jobs:
-  dispatcher-smoke:
+  actionlint:
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm a runner job can start
-        run: echo "Vexyn CI dispatcher smoke test passed."
+      - name: Checkout Vexyn branch
+        uses: actions/checkout@v4
+
+      - name: Download actionlint
+        run: bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+        shell: bash
+
+      - name: Validate workflow syntax and expressions
+        run: ./actionlint -color .github/workflows/ci.yml .github/workflows/on-demand-preview-releases-PR.yml .github/workflows/nightly-build.yml
+        shell: bash
