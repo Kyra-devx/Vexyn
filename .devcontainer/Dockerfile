@@ -1,9 +1,9 @@
-# Acode Development Container
+# Vexyn Development Container
 #
 # Devcontainer usage: automatic via devcontainer.json
 # Standalone usage:
-#   docker build --target standalone -t acode-dev .devcontainer/
-#   docker run -it -v $(pwd):/workspaces/acode acode-dev
+#   docker build --target standalone -t vexyn-dev .devcontainer/
+#   docker run -it -v $(pwd):/workspaces/vexyn vexyn-dev
 
 FROM mcr.microsoft.com/devcontainers/java:1-21-bookworm AS base
 
@@ -32,10 +32,10 @@ RUN wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-
 
 ENV PATH="${PATH}:${GRADLE_HOME}/bin"
 
-WORKDIR /workspaces/acode
+WORKDIR /workspaces/vexyn
 
-LABEL org.opencontainers.image.authors="Acode Foundation <https://github.com/Acode-Foundation/Acode>"
-LABEL description="Development environment for building Acode - Code Editor for Android"
+LABEL org.opencontainers.image.authors="Vexyn community <https://github.com/Kyra-devx/Vexyn>"
+LABEL description="Development environment for building Vexyn - Code Editor for Android"
 
 
 # Devcontainer stage
