@@ -50,9 +50,17 @@ jobs:
           SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
           SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
           test -x "$SDKMANAGER"
-          yes | "$SDKMANAGER" --licenses >/dev/null
-          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
+          # sdkmanager normally exits after accepting the needed licenses;
+          # the producer (yes) can receive SIGPIPE, so check sdkmanager's
+          # status directly instead of failing the whole pipeline on SIGPIPE.
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          LICENSE_STATUS=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$LICENSE_STATUS" -eq 0
+
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - name: Install Cordova CLI
         run: npm install --global cordova
 
