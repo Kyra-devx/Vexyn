@@ -1,6 +1,6 @@
-# Contributing to Acode
+# Contributing to Vexyn
 
-Thank you for your interest in contributing to Acode! This guide will help you get started with development.
+Thank you for your interest in contributing to Vexyn! This guide will help you get started with development.
 
 ## Quick Start Options
 
@@ -10,8 +10,8 @@ Thank you for your interest in contributing to Acode! This guide will help you g
 
 2. Clone and open the repository:
    ```bash
-   git clone --recurse-submodules https://github.com/Acode-Foundation/Acode.git
-   code Acode
+   git clone --recurse-submodules https://github.com/Kyra-devx/Vexyn.git
+   code Vexyn
    ```
 
 3. When VS Code prompts "Reopen in Container", click it
@@ -36,14 +36,14 @@ If your editor doesn't support DevContainers, you can use Docker directly:
 ```bash
 # Clone the repository
 git clone --recurse-submodules https://github.com/Acode-Foundation/Acode.git
-cd Acode
+cd Vexyn
 
 # Build the Docker image from our Dockerfile
 docker build --target standalone -t acode-dev .devcontainer/
 
 # Run the container with your code mounted
 docker run -it --rm \
-  -v "$(pwd):/workspaces/acode" \
+  -v "$(pwd):/workspaces/vexyn" \
   -w /workspaces/acode \
   acode-dev \
   bash
@@ -208,7 +208,7 @@ refactor: simplify file loading logic
 
 ## ℹ️ Adding New Icons (to the existing font family)
 > [!NOTE]
-> Acode uses SVG and converts them into a font family, to be used inside the editor and generally for plugin devs.
+> Vexyn uses SVG and converts them into a font family, to be used inside the editor and generally for plugin devs.
 > 
 > **Plugin-specific icons SHOULD NOT be added into the editor. Only generally helpful icons SHOULD BE added**
 
