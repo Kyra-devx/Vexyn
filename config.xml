@@ -7,8 +7,8 @@
     <description>
         Vexyn is a community-maintained code editor and web IDE for Android.
     </description>
-    <author email="ajit@foxdebug.com" href="https://foxdebug.com">
-        Foxdebug
+    <author href="https://github.com/Kyra-devx/Vexyn">
+        Vexyn Community
     </author>
     <content src="index.html" />
     <access launch-external="yes" origin="*" />
