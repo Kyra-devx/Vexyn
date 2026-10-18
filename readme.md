@@ -41,7 +41,7 @@ Vexyn/
 
 ## • Multi-language Support
 
-Enhance Vexyn's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/Acode-Foundation/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/Kyra-devx/Vexyn/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
+Enhance Vexyn's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/Kyra-devx/Vexyn/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/Kyra-devx/Vexyn/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
 
 ```shell
 pnpm run lang add
@@ -62,16 +62,16 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
 
 ## • Developing a Plugin
 
-For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
+For comprehensive documentation on creating plugins for the upstream-compatible plugin system, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
 
-For plugin development information, refer to: [Acode Plugin Documentation](https://docs.acode.app/)
+For plugin development information, refer to: [Plugin Documentation](https://docs.acode.app/)
 
 ## Star History
 
 <a href="https://star-history.com/#Kyra-devx/Vexyn&Date">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Kyra-devx/Vexyn&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Kyra-devx/Vexyn&type=Date" />
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date" />
  </picture>
 </a>
