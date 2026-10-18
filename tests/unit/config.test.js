@@ -175,6 +175,22 @@ function createFixture({
 	};
 }
 
+test("uses Vexyn-specific Android application IDs", () => {
+	assert.equal(ID_PAID, "com.vexyn.devx");
+	assert.equal(ID_FREE, "com.vexyn.devx.free");
+
+	const config = fs.readFileSync(
+		new URL("../../config.xml", import.meta.url),
+		"utf8",
+	);
+	const packageJson = JSON.parse(
+		fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+	);
+
+	assert.match(config, /<widget id="com\.vexyn\.devx"/);
+	assert.equal(packageJson.name, ID_PAID);
+});
+
 function pluginState(overrides = {}) {
 	return {
 		installed: false,

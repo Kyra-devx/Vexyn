@@ -1,0 +1,95 @@
+name: Vexyn CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-build:
+    name: Test, lint, localize and build Vexyn APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Vexyn
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Biome quality checks
+        run: npx biome ci .
+
+      - name: Translation consistency check
+        run: npm run lang check
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+
+          # sdkmanager normally exits after accepting the needed licenses;
+          # the producer (yes) can receive SIGPIPE, so check sdkmanager's
+          # status directly instead of failing the whole pipeline on SIGPIPE.
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          LICENSE_STATUS=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$LICENSE_STATUS" -eq 0
+
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Install Cordova CLI
+        run: npm install --global cordova
+
+      - name: Set up Cordova project and plugins
+        run: npm run setup
+
+      - name: Enable storage permission and refresh terminal plugin
+        run: node utils/storage_manager.mjs y
+
+      - name: Build Vexyn debug APK
+        run: npm run build paid dev apk
+
+      - name: Verify APK application ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="platforms/android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          "$SDK_ROOT/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.vexyn.devx'"
+
+      - name: Upload Vexyn debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vexyn-debug-apk-${{ github.sha }}
+          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

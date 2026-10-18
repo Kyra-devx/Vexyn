@@ -1,14 +1,14 @@
-# Acode - Code Editor for Android
+# Vexyn — Code Editor for Android
 
 <p align="center">
   <img src='res/logo_1.png' width='250'>
 </p>
 
-[![](https://img.shields.io/endpoint?logo=telegram&label=Acode&style=flat&url=https%3A%2F%2Facode.app%2Fapi%2Ftelegram-members-count)](https://t.me/foxdebug_acode) [![](https://dcbadge.limes.pink/api/server/https://discord.gg/vVxVWYUAWD?style=flat)](https://discord.gg/vVxVWYUAWD)
+[![](https://dcbadge.limes.pink/api/server/https://discord.gg/vVxVWYUAWD?style=flat)](https://discord.gg/vVxVWYUAWD)
 
 ## • Overview
 
-Welcome to Acode Editor - a powerful and versatile code editing tool designed specifically for Android devices. Whether you're working on HTML, CSS, JavaScript, or other programming languages, Acode empowers you to code on-the-go with confidence.
+Welcome to Vexyn, a community-maintained code editor and web IDE for Android, based on the Acode codebase. Whether you're working on HTML, CSS, JavaScript, or other programming languages, Vexyn aims to make coding on the go practical and extensible.
 
 ## • Features
 
@@ -22,14 +22,13 @@ Welcome to Acode Editor - a powerful and versatile code editing tool designed sp
 
 ## • Installation
 
-You can get Acode Editor from popular platforms:
-
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="60"/>](https://www.f-droid.org/packages/com.foxdebug.acode/)
+Vexyn is not yet published through an official app store. Build from source using CONTRIBUTING.md; upstream Acode store packages are not Vexyn releases.
+ 
 
 ## • Project Structure
 
 <pre>
-Acode/
+Vexyn/
 |
 |- src/   - Core code and language files
 |
@@ -42,7 +41,7 @@ Acode/
 
 ## • Multi-language Support
 
-Enhance Acode's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/Acode-Foundation/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/Acode-Foundation/Acode/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
+Enhance Vexyn's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/Kyra-devx/Vexyn/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/Kyra-devx/Vexyn/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
 
 ```shell
 pnpm run lang add
@@ -57,22 +56,22 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
 
 ## • Contributors
 
-<a href="https://github.com/Acode-Foundation/Acode/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Acode-Foundation/Acode" />
+<a href="https://github.com/Kyra-devx/Vexyn/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Kyra-devx/Vexyn" />
 </a>
 
-## • Developing a Plugin for Acode
+## • Developing a Plugin
 
-For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
+For comprehensive documentation on creating plugins for the upstream-compatible plugin system, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
 
-For plugin development information, refer to: [Acode Plugin Documentation](https://docs.acode.app/)
+For plugin development information, refer to: [Plugin Documentation](https://docs.acode.app/)
 
 ## Star History
 
-<a href="https://star-history.com/#Acode-Foundation/Acode&Date">
+<a href="https://star-history.com/#Kyra-devx/Vexyn&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Kyra-devx/Vexyn&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Kyra-devx/Vexyn&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Kyra-devx/Vexyn&type=Date" />
  </picture>
 </a>

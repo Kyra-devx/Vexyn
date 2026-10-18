@@ -1,4 +1,4 @@
-// setup acode for the first time
+// Set up Vexyn for the first time
 // 1. verify git submodules are checked out
 // 2. install dependencies
 // 3. add cordova platform android@10.2
@@ -13,7 +13,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const PLATFORM_FILES = [".DS_Store"];
 const PACKAGE_MANAGERS = new Set(["bun", "npm", "pnpm", "yarn"]);
-const ID_PAID = "com.foxdebug.acode";
+const { ID_PAID } = require("./config.js");
 const ADMOB_PLUGIN_DIR = "admob";
 const REPO_ROOT = path.join(__dirname, "..");
 
