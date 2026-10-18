@@ -9,7 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  quality:
+  verify-and-build:
+    name: Test, lint, localize and build Vexyn APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Vexyn
@@ -42,7 +43,6 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-
       - name: Install Android SDK components
         shell: bash
         run: |
@@ -52,3 +52,24 @@ jobs:
           test -x "$SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null
           "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install Cordova CLI
+        run: npm install --global cordova
+
+      - name: Set up Cordova project and plugins
+        run: npm run setup
+
+      - name: Enable storage permission and refresh terminal plugin
+        run: node utils/storage_manager.mjs y
+
+      - name: Build Vexyn debug APK
+        run: npm run build paid dev apk
+
+      - name: Verify APK application ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="platforms/android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          "$SDK_ROOT/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.vexyn.devx'"
