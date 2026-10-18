@@ -1,14 +1,14 @@
-# Acode - Code Editor for Android
+# Vexyn — Code Editor for Android
 
 <p align="center">
   <img src='res/logo_1.png' width='250'>
 </p>
 
-[![](https://img.shields.io/endpoint?logo=telegram&label=Acode&style=flat&url=https%3A%2F%2Facode.app%2Fapi%2Ftelegram-members-count)](https://t.me/foxdebug_acode) [![](https://dcbadge.limes.pink/api/server/https://discord.gg/vVxVWYUAWD?style=flat)](https://discord.gg/vVxVWYUAWD)
+[![](https://dcbadge.limes.pink/api/server/https://discord.gg/vVxVWYUAWD?style=flat)](https://discord.gg/vVxVWYUAWD)
 
 ## • Overview
 
-Welcome to Acode Editor - a powerful and versatile code editing tool designed specifically for Android devices. Whether you're working on HTML, CSS, JavaScript, or other programming languages, Acode empowers you to code on-the-go with confidence.
+Welcome to Vexyn, a community-maintained code editor and web IDE for Android, based on the Acode codebase. Whether you're working on HTML, CSS, JavaScript, or other programming languages, Vexyn aims to make coding on the go practical and extensible.
 
 ## • Features
 
@@ -22,48 +22,12 @@ Welcome to Acode Editor - a powerful and versatile code editing tool designed sp
 
 ## • Installation
 
-You can get Acode Editor from popular platforms:
+Vexyn is not yet published through an official app store. Build from source using CONTRIBUTING.md; the upstream Acode store packages are not Vexyn releases.
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="60"/>](https://www.f-droid.org/packages/com.foxdebug.acode/)
-
-## • Project Structure
-
-<pre>
-Acode/
-|
-|- src/   - Core code and language files
-|
-|- www/   - Public documents, compiled files, and HTML templates
-|
-|- utils/ - CLI tools for building, string manipulation, and more
-|
-|- codemirror-lsp-client/ - Git submodule providing @codemirror/lsp-client (clone with --recurse-submodules)
-</pre>
-
-## • Multi-language Support
-
-Enhance Acode's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/Acode-Foundation/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/Acode-Foundation/Acode/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
-
-```shell
-pnpm run lang add
-pnpm run lang remove
-pnpm run lang search
-pnpm run lang update
-```
-
-## • Contributing & Building the Application
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
-
-## • Contributors
-
-<a href="https://github.com/Acode-Foundation/Acode/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Acode-Foundation/Acode" />
-</a>
 
 ## • Developing a Plugin for Acode
 
-For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
+For comprehensive documentation on creating plugins for the upstream Acode editor, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
 
 For plugin development information, refer to: [Acode Plugin Documentation](https://docs.acode.app/)
 
