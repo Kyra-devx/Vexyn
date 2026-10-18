@@ -22,7 +22,7 @@ function replaceImport(filePath, applicationId) {
   const data = fs.readFileSync(filePath, "utf8");
 
   const updated = data.replace(
-    /(import\\s+)(?:com\\.foxdebug\\.(?:acode|acodefree|devx)|com\\.vexyn\\.devx)(\\.R;)/,
+    /(import\s+)(?:com\.foxdebug\.(?:acode|acodefree|devx)|com\.vexyn\.devx)(\.R;),
     `$1${applicationId}$2`
   );
 
