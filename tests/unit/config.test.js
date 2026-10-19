@@ -90,16 +90,10 @@ function createFixture({
 	write(".babelrc", '{"compact":false}\n');
 	write(
 		"res/android/values/ic_launcher_background.xml",
-		id === ID_FREE
-			? `<?xml version="1.0" encoding="utf-8"?>
+		`<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#ffffff</color>
-    <color name="ic_splash_background">#313131</color>
-</resources>`
-			: `<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="ic_launcher_background">#3a3e54</color>
-    <color name="ic_splash_background">#3a3e54</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="ic_splash_background">#FFFFFF</color>
 </resources>`,
 	);
 	if (bundleExists) write("src/plugins/admob/www/admob.js", "bundle");
