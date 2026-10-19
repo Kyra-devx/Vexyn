@@ -29,12 +29,12 @@ test("Vexyn logo artwork is used consistently by web and native branding", () =>
   assert.equal((launcherForeground.match(/android:pathData=/g) ?? []).length, 4);
   assert.equal((launcherForeground.match(/android:strokeColor="#451615"/g) ?? []).length, 4);
   assert.match(launcherForeground, /android:fillColor="#3499FE"/);
-  assert.match(legacyLauncher, /<vector\\b/);
+  assert.match(legacyLauncher, /<vector\b/);
   assert.match(legacyLauncher, /android:fillColor="#FFFFFF"/);
   assert.match(legacyLauncher, /android:strokeColor="#451615"/);
   assert.equal(
     legacyLauncher.replace(
-      '  <path android:fillColor="#FFFFFF" android:pathData="M0,0H544.37V452.63H0Z" />\\n',
+      '  <path android:fillColor="#FFFFFF" android:pathData="M0,0H544.37V452.63H0Z" />\n',
       "",
     ),
     launcherForeground,
