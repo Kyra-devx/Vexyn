@@ -1,7 +1,7 @@
 # Vexyn — Code Editor for Android
 
 <p align="center">
-  <img src='res/logo_1.png' width='250'>
+  <img src='res/vexyn-logo.svg' alt='Vexyn logo' width='320'>
 </p>
 
 [![](https://dcbadge.limes.pink/api/server/https://discord.gg/vVxVWYUAWD?style=flat)](https://discord.gg/vVxVWYUAWD)
