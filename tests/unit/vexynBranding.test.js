@@ -49,7 +49,7 @@ test("Vexyn logo artwork is used consistently by web and native branding", () =>
 	assert.equal(
 		legacyLauncher.replace(
 			'  <path android:fillColor="#FFFFFF" android:pathData="M0,0H544.37V452.63H0Z" />\n',
-			""
+			"",
 		),
 		launcherForeground,
 	);
