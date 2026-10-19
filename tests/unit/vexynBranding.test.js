@@ -32,7 +32,27 @@ test("Vexyn logo artwork is used consistently by web and native branding", () =>
   assert.match(legacyLauncher, /<vector\\b/);
   assert.match(legacyLauncher, /android:fillColor="#FFFFFF"/);
   assert.match(legacyLauncher, /android:strokeColor="#451615"/);
+  assert.equal(
+    legacyLauncher.replace(
+      '  <path android:fillColor="#FFFFFF" android:pathData="M0,0H544.37V452.63H0Z" />\\n',
+      "",
+    ),
+    launcherForeground,
+  );
   assert.equal(legacyRoundLauncher, legacyLauncher);
+
+  for (const density of ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"]) {
+    assert.equal(
+      fs.existsSync(new URL(`../../res/android/mipmap-${density}/ic_launcher.webp`, import.meta.url)),
+      false,
+      `stale ${density} launcher fallback must not override the Vexyn vector`,
+    );
+    assert.equal(
+      fs.existsSync(new URL(`../../res/android/mipmap-${density}/ic_launcher_round.webp`, import.meta.url)),
+      false,
+      `stale ${density} round launcher fallback must not override the Vexyn vector`,
+    );
+  }
 
   assert.match(launcherBackground, /ic_launcher_background">#FFFFFF/);
   assert.match(launcherBackground, /ic_splash_background">#FFFFFF/);
