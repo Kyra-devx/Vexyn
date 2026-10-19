@@ -28,7 +28,7 @@
         <preference name="SplashScreen" value="none" />
         <preference name="ShowTitle" value="true" />
         <preference name="DisallowOverscroll" value="true" />
-        <preference name="BackgroundColor" value="0xFF313131" />
+        <preference name="BackgroundColor" value="0xFFFFFFFF" />
         <preference name="AndroidWindowSplashScreenBackground" value="@color/ic_splash_background" />
         <preference name="AndroidWindowSplashScreenAnimatedIcon"
             value="res/android/drawable/ic_launcher_foreground.xml" />
