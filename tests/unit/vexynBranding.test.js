@@ -10,6 +10,8 @@ test("Vexyn logo artwork is used consistently by web and native branding", () =>
   const componentLogo = read("../../src/components/logo/logo.svg");
   const publicLogo = read("../../www/logo.svg");
   const launcherForeground = read("../../res/android/drawable/ic_launcher_foreground.xml");
+  const legacyLauncher = read("../../res/android/mipmap-anydpi/ic_launcher.xml");
+  const legacyRoundLauncher = read("../../res/android/mipmap-anydpi/ic_launcher_round.xml");
   const launcherBackground = read("../../res/android/values/ic_launcher_background.xml");
   const config = read("../../config.xml");
   const logoStyle = read("../../src/components/logo/style.scss");
@@ -27,6 +29,10 @@ test("Vexyn logo artwork is used consistently by web and native branding", () =>
   assert.equal((launcherForeground.match(/android:pathData=/g) ?? []).length, 4);
   assert.equal((launcherForeground.match(/android:strokeColor="#451615"/g) ?? []).length, 4);
   assert.match(launcherForeground, /android:fillColor="#3499FE"/);
+  assert.match(legacyLauncher, /<vector\\b/);
+  assert.match(legacyLauncher, /android:fillColor="#FFFFFF"/);
+  assert.match(legacyLauncher, /android:strokeColor="#451615"/);
+  assert.equal(legacyRoundLauncher, legacyLauncher);
 
   assert.match(launcherBackground, /ic_launcher_background">#FFFFFF/);
   assert.match(launcherBackground, /ic_splash_background">#FFFFFF/);
